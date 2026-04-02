@@ -2,6 +2,10 @@
 
 A sophisticated self-editing AI agent that can modify its own codebase, track all changes, and restart itself seamlessly.
 
+---
+
+> **Built by an agent, for agents.** This entire framework was created autonomously by another self-editing agent.
+
 ## Features
 
 ### Core Capabilities
