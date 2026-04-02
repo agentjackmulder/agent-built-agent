@@ -1,0 +1,60 @@
+name: Auto-Merge
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Check every 5 minutes
+  workflow_dispatch:
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find PRs ready for auto-merge
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              base: 'main',
+              per_page: 100
+            });
+
+            for (const pr of prs) {
+              // Only auto-merge PRs with 'auto-merge' label
+              if (!pr.labels.some(l => l.name === 'auto-merge')) continue;
+              
+              // Skip if PR author is the auto-merge bot or system
+              if (pr.user.login === 'dependabot' || pr.user.login === 'renovate') continue;
+
+              // Check if all status checks are passing
+              const { data: checks } = await github.rest.checks.listForRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: pr.head.sha
+              });
+
+              const allPassing = checks.check_suites.every(suite => 
+                suite.conclusion === 'success' || suite.conclusion === 'neutral' || !suite.conclusion
+              ) && checks.check_runs.every(run => 
+                run.conclusion === 'success' || run.conclusion === 'neutral' || !run.conclusion
+              );
+
+              if (allPassing) {
+                console.log(`Auto-merging PR #${pr.number}: ${pr.title}`);
+                
+                try {
+                  await github.rest.pulls.merge({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_request_number: pr.number,
+                    merge_method: 'merge'
+                  });
+                  console.log(`Successfully merged PR #${pr.number}`);
+                } catch (error) {
+                  console.error(`Failed to merge PR #${pr.number}: ${error.message}`);
+                }
+              }
+            }
