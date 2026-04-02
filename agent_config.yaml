@@ -1,0 +1,23 @@
+name: SelfEditingAgent
+agent_id: default
+version: 0.2.0
+edit_config:
+  enabled: true
+  dry_run: false
+  backup_before_edit: true
+  max_edit_size: 10000
+  require_reason: true
+  auto_commit: false
+state_config:
+  state_dir: .agent_state
+  auto_save: true
+  save_interval_seconds: 60
+  max_history_entries: 100
+logging_config:
+  level: INFO
+  log_file: null
+  log_to_console: true
+  include_timestamps: true
+max_edits_per_session: 100
+enable_self_modification: true
+require_confirmation_for_major_changes: true

@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+agent_built_agent.egg-info/PKG-INFO
+agent_built_agent.egg-info/SOURCES.txt
+agent_built_agent.egg-info/dependency_links.txt
+agent_built_agent.egg-info/entry_points.txt
+agent_built_agent.egg-info/requires.txt
+agent_built_agent.egg-info/top_level.txt
+tests/test_config.py
+tests/test_editors.py
+tests/test_state.py
+tests/test_version_control.py
